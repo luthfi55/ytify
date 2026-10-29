@@ -1,4 +1,4 @@
-import { createSignal, For, createEffect, Show } from "solid-js";
+import { createSignal, For, createEffect, Show, onMount, onCleanup } from "solid-js";
 import { generateImageUrl } from "@utils";
 import { config, setConfig } from "@config";
 import { proxyHandler } from "@modules/playback";
@@ -12,6 +12,33 @@ export default function() {
   });
   let video!: HTMLVideoElement;
   let selector!: HTMLSelectElement;
+  let resumeOnVisible = false;
+  let userPaused = false;
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "hidden") {
+      resumeOnVisible = playerStore.isWatching && !userPaused;
+      return;
+    }
+    if (!resumeOnVisible) return;
+    resumeOnVisible = false;
+    if (
+      !video?.src ||
+      !playerStore.isWatching ||
+      playerStore.audio.paused ||
+      !video.paused
+    )
+      return;
+    video.currentTime = playerStore.audio.currentTime;
+    video.play().catch(() => {});
+  };
+
+  onMount(() =>
+    document.addEventListener("visibilitychange", handleVisibilityChange),
+  );
+  onCleanup(() =>
+    document.removeEventListener("visibilitychange", handleVisibilityChange),
+  );
 
 
   const savedQ = config.watchMode || { worst: '144p', low: '240', medium: '360p', high: '720p' }[config.quality];
@@ -90,10 +117,13 @@ export default function() {
         controls
         poster={generateImageUrl(playerStore.stream.id, 'mq')}
         onplay={() => {
+          userPaused = false;
           video.currentTime = playerStore.audio.currentTime;
           playerStore.audio.play();
         }}
         onpause={() => {
+          if (document.visibilityState !== "visible") return;
+          userPaused = true;
           if (playerStore.isWatching)
             playerStore.audio.pause();
           playerStore.audio.currentTime = video.currentTime;
@@ -105,7 +135,7 @@ export default function() {
           }
         }}
         onwaiting={() => {
-          if (!playerStore.audio.paused)
+          if (document.visibilityState === "visible" && !playerStore.audio.paused)
             playerStore.audio.pause();
         }}
         ontimeupdate={() => {
