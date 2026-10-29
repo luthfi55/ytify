@@ -62,20 +62,22 @@ export default function() {
     const hasAv1 = data.adaptiveFormats.filter(v => v.type?.includes('av01')).length === 4 ? data.adaptiveFormats.find(v => v.type?.includes('av01'))?.url : false;
     const hasVp9 = data.adaptiveFormats.find(v => v.type?.includes('vp9'))?.url;
 
+    const videoStreams = data.adaptiveFormats
+      .filter(f => {
+        if (!f.type.startsWith('video')) return false;
+        const av1 = hasAv1 && supportsAv1 && f.type?.includes('av01');
+        if (av1) return true;
+        const vp9 = !hasAv1 && f.type?.includes('vp9');
+        if (vp9) return true;
+        const avc = !hasVp9 && f.type?.includes('avc1');
+        if (avc) return true;
+        return false;
+      })
+      .map(f => ([f.resolution || f.quality, f.url]));
+
     video.currentTime = playerStore.audio.currentTime;
     setData({
-      video: data.adaptiveFormats
-        .filter(f => {
-          if (!f.type.startsWith('video')) return false;
-          const av1 = hasAv1 && supportsAv1 && f.type?.includes('av01');
-          if (av1) return true;
-          const vp9 = !hasAv1 && f.type?.includes('vp9');
-          if (vp9) return true;
-          const avc = !hasVp9 && f.type?.includes('avc1');
-          if (avc) return true;
-          return false;
-        })
-        .map(f => ([f.resolution || f.quality, f.url])),
+      video: videoStreams,
       captions: data.captions.map(c => ({
         ...c,
         url: playerStore.proxy + c.url
@@ -87,8 +89,14 @@ export default function() {
       video.pause();
     }
     delete video.dataset.retried;
-    if (savedQ)
-      video.src = proxyHandler(selector.value, true);
+
+    // Providers name resolutions differently (Invidious vs RapidAPI), so fall
+    // back to the first available stream instead of a placeholder option.
+    const initialStream = videoStreams.find(v => v[0] === savedQ) ?? videoStreams[0];
+    if (initialStream?.[1]) {
+      selector.value = initialStream[1];
+      video.src = proxyHandler(initialStream[1], true);
+    }
 
   });
 
@@ -103,7 +111,6 @@ export default function() {
       <video
         ref={video}
         controls
-        crossorigin="anonymous"
         poster={generateImageUrl(playerStore.stream.id, 'mq')}
         onplay={() => {
           video.currentTime = playerStore.audio.currentTime;
@@ -149,6 +156,7 @@ export default function() {
           playerStore.audio.playbackRate = video.playbackRate;
         }}
         onerror={async () => {
+          if (!video.src) return;
           const oldOrigin = new URL(video.src).origin;
           const { default: audioErrorHandler } = await import("@modules/audioErrorHandler");
           audioErrorHandler(video);
