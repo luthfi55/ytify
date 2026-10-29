@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 65
-* Generated at: 2026-10-29T04:32:35.991Z
+* Total icons: 67
+* Generated at: 2026-10-29T05:01:03.163Z
 */
 
 @font-face {
@@ -96,6 +96,14 @@
 
 .ri-external-link-line:before {
   content: "\ecaf";
+}
+
+.ri-eye-line:before {
+  content: "\ecb5";
+}
+
+.ri-eye-off-line:before {
+  content: "\ecb7";
 }
 
 .ri-forward-15-line:before {

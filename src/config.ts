@@ -70,6 +70,7 @@ export let config = {
   searchSuggestions: true,
   saveRecentSearches: true,
   loadImage: true,
+  hidePlayer: false,
   playerBackground: "none" as PlayerBackground,
   panelRatio: "2:5" as PanelRatio,
   roundness: "0.4rem",
@@ -120,6 +121,7 @@ if (!PLAYER_BACKGROUNDS.includes(config.playerBackground))
   config.playerBackground = "none";
 if (config.shareAction !== "play" && config.shareAction !== "watch")
   config.shareAction = "play";
+if (typeof config.hidePlayer !== "boolean") config.hidePlayer = false;
 
 export function setConfig<K extends keyof AppConfig>(
   key: K,
@@ -149,6 +151,16 @@ export function setLibrarySection(key: LibrarySectionKey, val: boolean) {
 export const [cachingMode, setCachingModeSignal] = createSignal<CachingMode>(
   config.cachingMode,
 );
+
+/* Player visibility */
+
+const [playerHidden, setPlayerHiddenSignal] = createSignal(config.hidePlayer);
+export { playerHidden };
+
+export function setPlayerHidden(hidden: boolean) {
+  setPlayerHiddenSignal(hidden);
+  setConfig("hidePlayer", hidden);
+}
 
 /* Player artwork background */
 

@@ -2,6 +2,7 @@ import { Show } from "solid-js";
 import { config } from "@config";
 import { store, navStore, t, openSubView } from "@stores";
 import Dropdown from "@features/Library/Dropdown";
+import PlayerToggle from "@components/PlayerToggle";
 
 export default function HeaderActions() {
   return (
@@ -32,6 +33,7 @@ export default function HeaderActions() {
             }}
           ></i>
         </Show>
+        <PlayerToggle />
         <Show when={navStore.active !== "settings"}>
           <i
             class="ri-settings-line"

@@ -19,6 +19,7 @@ import Results from "./Results";
 import CollectionSelector from "@components/ActionsMenu/CollectionSelector";
 import ListItem from "@components/ListItem";
 import HeaderNav from "@components/HeaderNav";
+import PlayerToggle from "@components/PlayerToggle";
 
 function ArtistRow(props: { artists: Channel[] }) {
   return (
@@ -323,6 +324,7 @@ export default function () {
         />
 
         <div class="right-group">
+          <PlayerToggle />
           <i
             aria-label={t("list_mark_mode")}
             aria-checked={markMode()}

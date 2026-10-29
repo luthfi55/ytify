@@ -10,6 +10,7 @@ import {
 import List from "./List";
 import Dropdown from "./Dropdown";
 import HeaderNav from "@components/HeaderNav";
+import PlayerToggle from "@components/PlayerToggle";
 
 export default function () {
   let queueSection!: HTMLDivElement;
@@ -47,6 +48,7 @@ export default function () {
           }
         />
         <div class="right-group">
+          <PlayerToggle />
           <i
             class="ri-shuffle-line"
             aria-label={t("queue_shuffle")}

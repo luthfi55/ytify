@@ -34,6 +34,7 @@ export default function () {
 
   function updateStaticBackgroundPosition() {
     if (!playerSection) return;
+    if (playerSection.offsetParent === null) return;
     const { offsetHeight, offsetWidth } = playerSection;
     if (offsetHeight === 0) {
       requestAnimationFrame(updateStaticBackgroundPosition);

@@ -327,6 +327,14 @@ main {
         flex-direction: column;
     }
 
+    main.player-hidden .left-panel {
+        display: none;
+    }
+
+    main.player-hidden .right-panel {
+        flex: 1;
+    }
+
     .right-panel {
         flex: var(--panelRatioRight, 5);
         height: 100%;
@@ -407,6 +415,14 @@ main {
 
     main.player-closed {
         overflow-x: hidden;
+    }
+
+    main.player-hidden {
+        overflow-x: hidden;
+    }
+
+    main.player-hidden .left-panel {
+        display: none;
     }
 
     .header-nav {

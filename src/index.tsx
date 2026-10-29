@@ -12,6 +12,7 @@ import {
 import { render } from "solid-js/web";
 import { syncLibrary } from "@modules/library";
 import { themer } from "@modules/theme";
+import { playerHidden } from "@config";
 import {
   updateLang,
   setStore,
@@ -207,6 +208,7 @@ export default function App() {
         ref={mainRef}
         classList={{
           "player-closed": isPortrait() && !navStore.player.state,
+          "player-hidden": playerHidden(),
         }}
       >
         <div class="left-panel" ref={leftPanelRef}>

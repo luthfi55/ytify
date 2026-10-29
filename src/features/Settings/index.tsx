@@ -7,6 +7,7 @@ import { setCachingMode, deleteCollection, getCollection } from "@modules/librar
 import { quickSwitch } from "@modules/playback";
 import { themer, applyPanelRatio } from "@modules/theme";
 import Dropdown from "./Dropdown";
+import PlayerToggle from "@components/PlayerToggle";
 
 export default function () {
   let settingsSection!: HTMLDivElement;
@@ -53,6 +54,7 @@ export default function () {
     <section ref={settingsSection} class="settingsSection">
       <header>
         <p>{t("nav_settings")}</p>
+        <PlayerToggle />
         <i
           aria-label={t("close")}
           class="ri-close-large-line"
