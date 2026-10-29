@@ -142,7 +142,7 @@ export default function () {
                     name={item.name}
                     id={item.id}
                     img={item.img}
-                    author={item.author || "YouTube Music"}
+                    author={item.author || "SoundDesk"}
                     type="playlist"
                   />
                 )}

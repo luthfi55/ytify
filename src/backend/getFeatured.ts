@@ -59,7 +59,7 @@ async function fetchArtistData(
             id: musicItem.id || "",
             name: musicItem.title?.toString() || "",
             img: formatThumbnailId(getThumbnail(musicItem.thumbnail || [])),
-            author: musicItem.subtitle?.toString() || name || "YouTube Music",
+            author: musicItem.subtitle?.toString() || name || "SoundDesk",
             type: "playlist",
           };
         }

@@ -1,6 +1,6 @@
 # UI Systems & Invariants
 
-This document establishes the UI design opinions and layout standards across the ytify interface.
+This document establishes the UI design opinions and layout standards across the SoundDesk interface.
 
 ---
 
@@ -70,7 +70,7 @@ This document establishes the UI design opinions and layout standards across the
 
 ## 2. Navigation & Playback Keyboard Controls
 
-ytify enforces strict single-key navigation and web music playback shortcuts in `src/index.tsx`:
+SoundDesk enforces strict single-key navigation and web music playback shortcuts in `src/index.tsx`:
 
 - **Active Form Field Suppression**: All shortcuts are strictly suppressed when focus is within `INPUT`, `TEXTAREA`, `SELECT`, `[contenteditable]`, or active dialog overlays.
 - **Navigation Shortcuts**:

@@ -68,12 +68,12 @@ async function fetchPlaylist(id: string): Promise<Playlist | null> {
 
     return {
       id,
-      name: data.name || "YouTube Playlist",
-      author: data.author || "YouTube Music",
+      name: data.name || "Playlist",
+      author: data.author || "SoundDesk",
       img: apiImg,
     };
   } catch (e) {
-    console.error("Failed to import YouTube playlist:", e);
+    console.error("Failed to import playlist:", e);
     return null;
   }
 }

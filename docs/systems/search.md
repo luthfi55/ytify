@@ -1,6 +1,6 @@
 # Search System & Invariants
 
-This document establishes the architecture, query lifecycle, and invariants for search and search suggestions in ytify.
+This document establishes the architecture, query lifecycle, and invariants for search and search suggestions in SoundDesk.
 
 ---
 

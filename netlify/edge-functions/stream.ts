@@ -147,7 +147,7 @@ export default async (request: Request, context: Context) => {
   const isBanned = HARD_BANNED_SUBNETS.some(subnet => clientIp.startsWith(subnet));
   if (isBanned) {
     console.warn(`[FAST-DROP] Blocked heavy abuser ${clientIp} at the gate.`);
-    return new Response('Fast Gateway Firewall Drop | You have been restricted from access to the ytify fallback service.', {
+    return new Response('Fast Gateway Firewall Drop | You have been restricted from access to the SoundDesk fallback service.', {
       status: 403,
       headers: {
         "Cache-Control": "public, s-maxage=86400",
@@ -282,12 +282,12 @@ export default async (request: Request, context: Context) => {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="${data.title || ''} by ${(data.channelTitle || '').replace(' - Topic', '')} in ytify">
+  <meta name="description" content="${data.title || ''} by ${(data.channelTitle || '').replace(' - Topic', '')} in SoundDesk">
   <meta property="og:title" content="${data.title || ''}">
   <meta property="og:description" content="By ${(data.channelTitle || '').replace(' - Topic', '')}">
   <meta property="og:image" content="${thumbnail}">
   <meta property="og:type" content="website">
-  <title>${data.title || 'Playback'} | ytify</title>
+  <title>${data.title || 'Playback'} | SoundDesk</title>
   <script>location.replace('/?s=${id}')</script>
 </head>
 <body>Redirecting...</body>

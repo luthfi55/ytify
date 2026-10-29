@@ -25,6 +25,7 @@
       "@modules/*": ["./src/modules/*"],
       "@components/*": ["./src/components/*"],
       "@features/*": ["./src/features/*"],
+      "@brand": ["./src/brand.ts"],
     },
   },
   "include": ["src", "netlify", "api", "scripts"],

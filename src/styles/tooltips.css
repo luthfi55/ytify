@@ -1,4 +1,4 @@
-/* Contextual Tooltip System for ytify */
+/* Contextual tooltip system */
 
 :is(i, button)[aria-label] {
     position: relative;

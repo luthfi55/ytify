@@ -14,7 +14,7 @@ export default function Dropdown() {
   function exportSettings() {
     const link = document.createElement('a');
     const date = new Date().toISOString().split('T')[0];
-    link.download = `ytify_settings_${date}.json`;
+    link.download = `sounddesk_settings_${date}.json`;
     link.href = `data:text/json;charset=utf-8,${encodeURIComponent(lsGet('config') || '{}')}`;
     link.click();
   }

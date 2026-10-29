@@ -9,6 +9,7 @@ import {
   openSubView,
   resetList,
 } from "@stores";
+import { BRAND } from "@brand";
 import {
   cachingMode,
   config,
@@ -550,7 +551,7 @@ export async function fetchCollection(
 
   setListStore("isLoading", false);
 
-  document.title = display + " - ytify";
+  document.title = display + " - " + BRAND.name;
 }
 
 function setObserver(callback: () => number) {

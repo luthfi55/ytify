@@ -176,7 +176,7 @@ export default function Dropdown() {
               if (url) open(url);
             }}
           >
-            <i class="ri-youtube-fill"></i>
+            <i class="ri-external-link-line"></i>
             {t("actions_menu_yt_link")}
           </li>
 

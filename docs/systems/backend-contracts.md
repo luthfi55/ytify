@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the ytify backend API: response formats, parsing mechanisms, and data structure contracts. It consolidates the API contract (what clients receive) and parsing implementation (how we transform YouTube data).
+This document describes the SoundDesk backend API: response formats, parsing mechanisms, and data structure contracts. It consolidates the API contract (what clients receive) and parsing implementation (how we transform YouTube data).
 
 ---
 

@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
 * Total icons: 65
-* Generated at: 2026-10-28T22:59:19.901Z
+* Generated at: 2026-10-29T02:49:35.842Z
 */
 
 @font-face {
@@ -94,6 +94,10 @@
   content: "\f436";
 }
 
+.ri-external-link-line:before {
+  content: "\ecaf";
+}
+
 .ri-forward-15-line:before {
   content: "\f32d";
 }
@@ -160,6 +164,10 @@
 
 .ri-play-list-add-fill:before {
   content: "\f00e";
+}
+
+.ri-play-list-line:before {
+  content: "\f011";
 }
 
 .ri-radio-line:before {
@@ -266,14 +274,6 @@
   content: "\f256";
 }
 
-.ri-user-heart-fill:before {
-  content: "\f262";
-}
-
 .ri-video-line:before {
   content: "\f282";
-}
-
-.ri-youtube-fill:before {
-  content: "\f2d4";
 }

@@ -40,7 +40,7 @@ export default function Dropdown() {
   function exportLibrary() {
     const link = document.createElement("a");
     const date = new Date().toISOString().split("T")[0];
-    link.download = `ytify_library_${date}.json`;
+    link.download = `sounddesk_library_${date}.json`;
 
     const exportedData: { [key: string]: any } = {};
     for (const key of lsKeys("library_")) {
@@ -88,11 +88,11 @@ export default function Dropdown() {
           >
             <i class="ri-archive-stack-line"></i>&nbsp;{t("library_configure")}
           </li>
-          <li onclick={() => document.getElementById("upload_ytify")?.click()}>
+          <li onclick={() => document.getElementById("upload_sounddesk")?.click()}>
             <label>
               <i class="ri-import-line"></i>&nbsp;{t("library_import")}
             </label>
-            <input type="file" id="upload_ytify" onchange={importLibrary} />
+            <input type="file" id="upload_sounddesk" onchange={importLibrary} />
           </li>
           <li id="exportBtn" onclick={exportLibrary}>
             <i class="ri-export-line"></i>&nbsp;{t("library_export")}
@@ -126,7 +126,7 @@ export default function Dropdown() {
               (await import("@modules/importYouTubePlaylist")).default();
             }}
           >
-            <i class="ri-youtube-fill youtube-icon"></i>&nbsp;
+            <i class="ri-link"></i>&nbsp;
             {t("library_import_yt_playlist")}
           </li>
 

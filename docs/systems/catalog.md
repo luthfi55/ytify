@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide a normalized, deduplicated, single-source-of-truth record of every track ytify has resolved, so metadata repairs, user sync, and catalog reads share the same store while strictly adhering to Cloudflare Durable Object SQLite write limits (100,000 writes/day).
+Provide a normalized, deduplicated, single-source-of-truth record of every track SoundDesk has resolved, so metadata repairs, user sync, and catalog reads share the same store while strictly adhering to Cloudflare Durable Object SQLite write limits (100,000 writes/day).
 
 ---
 

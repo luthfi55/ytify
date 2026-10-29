@@ -6,6 +6,7 @@ import {
   t,
   updateParam,
 } from "@stores";
+import { BRAND } from "@brand";
 import { config } from "@config";
 import { convertSStoHHMMSS, generateImageUrl, isTopicAuthor, stripTopic } from "@utils";
 import { getTracksMap, saveTracksMap } from "@modules/library";
@@ -128,7 +129,7 @@ export async function applyMetadata(data: TrackItem) {
     ];
   }
 
-  document.title = data.title + " - ytify";
+  document.title = data.title + " - " + BRAND.name;
 
   if ("mediaSession" in navigator) {
     const { updateMediaSessionPosition } =

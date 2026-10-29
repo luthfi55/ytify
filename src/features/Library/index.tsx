@@ -71,7 +71,7 @@ export default function () {
       <Show when={libraryPlaylists().length > 0}>
         <article>
           <p>
-            <i class="ri-youtube-fill"></i>&nbsp;
+            <i class="ri-play-list-line"></i>&nbsp;
             {t("library_playlists")}
           </p>
           <div>

@@ -7,6 +7,7 @@ import OpenProps from "open-props";
 import { resolve } from "path";
 import { readdirSync, readFileSync } from "fs";
 import path from "path";
+import { BRAND } from "./src/brand";
 
 const pkg = JSON.parse(
   readFileSync(resolve(import.meta.dirname, "./package.json"), "utf-8"),
@@ -31,6 +32,7 @@ export default defineConfig(({ command }) => ({
       "@utils": path.resolve(import.meta.dirname, "./src/utils.ts"),
       "@components": path.resolve(import.meta.dirname, "./src/components"),
       "@features": path.resolve(import.meta.dirname, "./src/features"),
+      "@brand": path.resolve(import.meta.dirname, "./src/brand.ts"),
     },
   },
   plugins: [
@@ -38,10 +40,9 @@ export default defineConfig(({ command }) => ({
     apiMiddleware(command === "serve"),
     VitePWA({
       manifest: {
-        short_name: "Ytify",
-        name: "Listen with ytify",
-        description:
-          "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
+        short_name: BRAND.name,
+        name: BRAND.name,
+        description: BRAND.description,
         icons: [
           {
             src: "logo192.png",
@@ -106,8 +107,8 @@ export default defineConfig(({ command }) => ({
         launch_handler: {
           client_mode: "focus-existing",
         },
-        theme_color: "black",
-        background_color: "black",
+        theme_color: "#0f172a",
+        background_color: "#0f172a",
         share_target: {
           action: "/",
           method: "GET",
@@ -119,7 +120,7 @@ export default defineConfig(({ command }) => ({
         },
       },
       disable: command !== "build",
-      includeAssets: ["*.woff2", "ytify_banner.webp"],
+      includeAssets: ["*.woff2", "sounddesk_banner.png"],
     }),
   ],
   css: {

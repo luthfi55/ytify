@@ -3,9 +3,11 @@
   flex-direction: column;
   margin-bottom: var(--size-8);
 
-  svg {
-    transform: scale(9);
+  .brandMark {
+    width: 72px;
+    height: 72px;
     margin: var(--font-size-7) var(--font-size-6);
+    border-radius: var(--roundness);
   }
 
   a {

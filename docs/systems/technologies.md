@@ -1,6 +1,6 @@
 # Technology Inventory
 
-Living inventory of the runtimes, frameworks, platform APIs, services, and formats used by ytify. Update this file when a dependency, hosting component, or integration is added or removed.
+Living inventory of the runtimes, frameworks, platform APIs, services, and formats used by SoundDesk. Update this file when a dependency, hosting component, or integration is added or removed.
 
 Last reviewed: 2026-10-29
 

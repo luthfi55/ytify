@@ -1,5 +1,6 @@
 import { createSignal, For, onCleanup, createEffect } from "solid-js";
 import { playerStore, setPlayerStore, setStore, t } from "@stores";
+import { BRAND } from "@brand";
 
 export default function (props: { onClose: () => void }) {
   const [lrcMap, setLrcMap] = createSignal<{ time?: number; text: string }[]>([
@@ -39,7 +40,7 @@ export default function (props: { onClose: () => void }) {
     fetch(`https://lrclib.net/api/get?${params.toString()}`, {
       signal: controller.signal,
       headers: {
-        "Lrclib-Client": `ytify ${Build} (https://github.com/n-ce/ytify)`,
+        "Lrclib-Client": `${BRAND.name} ${Build} (${BRAND.repo})`,
       },
     })
       .then((res) => {

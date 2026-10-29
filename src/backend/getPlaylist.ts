@@ -30,7 +30,7 @@ export default async function (
       if (header?.is(YTNodes.MusicDetailHeader)) {
         const detailHeader = header.as(YTNodes.MusicDetailHeader);
         name = detailHeader.title.text || name;
-        author = detailHeader.author?.name || author || "YouTube Music";
+        author = detailHeader.author?.name || author || "SoundDesk";
         img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
       } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
         const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
@@ -46,7 +46,7 @@ export default async function (
           foundAuthor?.trim() ||
           (responsiveHeader as any).strapline_text_one?.text ||
           author ||
-          "YouTube Music";
+          "SoundDesk";
         const thumbContents =
           (responsiveHeader as any).thumbnail?.contents || [];
         img = formatThumbnailId(getThumbnail(thumbContents));
@@ -125,8 +125,7 @@ export default async function (
                   .map((a: any) => a.name)
                   .filter(Boolean)
                   .join(", ")
-              : (song as any).author?.name ||
-                (author && author !== "Unknown" ? author : "YouTube Music");
+              : (song as any).author?.name || author || "SoundDesk";
           const itemType = (
             (song as any).item_type === "video" ? "video" : "song"
           ) as "video" | "song";

@@ -289,7 +289,7 @@ export default function () {
             open("https://www.youtube.com/watch?v=" + store.actionsMenu?.id);
           }}
         >
-          <i class="ri-youtube-fill"></i>
+          <i class="ri-external-link-line"></i>
           {t("actions_menu_yt_link")}
         </li>
       </ul>
