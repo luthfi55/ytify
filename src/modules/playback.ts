@@ -265,6 +265,12 @@ export async function player(id?: string) {
     authorId: invidiousData.authorId,
   });
 
+  if (
+    !playerStore.isMusic &&
+    invidiousData.adaptiveFormats.some((f) => f.type.startsWith("video"))
+  )
+    setPlayerStore("isWatching", true);
+
   await applyAudioStreams(
     invidiousData.adaptiveFormats
       .filter((f) => f.type.startsWith("audio"))
