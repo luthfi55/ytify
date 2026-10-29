@@ -1,0 +1,15 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+[build.environment]
+  BUN_VERSION = "1.4.0"
+  # Same-origin proxy path so restricted origins do not need to be added to the
+  # upstream worker's CORS allowlist.
+  VITE_API = "/api"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.ytify.workers.dev/:splat"
+  status = 200
+  force = true
