@@ -8,6 +8,7 @@ import getSearchSuggestions from "./getSearchSuggestions.js";
 import getSimilar from "./getSimilar.js";
 import getSubFeed from "./getSubFeed.js";
 import { handleFixMetadata, type FixTarget } from "./fixMetadata.js";
+import { isAllowedMediaUrl, proxyMedia } from "./mediaProxy.js";
 import type {
   DurableObjectNamespace,
   ExecutionContext,
@@ -89,6 +90,34 @@ export default {
 
     const path = url.pathname.replace(/^\/+/, "");
     const searchParams = url.searchParams;
+
+    // --- Bounded fallback media proxy ---
+    if (path === "stream") {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return new Response("Method Not Allowed", {
+          status: 405,
+          headers: { ...corsHeaders, "Content-Type": "text/plain" },
+        });
+      }
+
+      const target = searchParams.get("u");
+      if (!target || !isAllowedMediaUrl(target)) {
+        return new Response("Invalid media URL", {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "text/plain" },
+        });
+      }
+
+      try {
+        return await proxyMedia(request, target);
+      } catch (error) {
+        console.error("[stream] media proxy failed:", error);
+        return new Response("Media proxy unavailable", {
+          status: 502,
+          headers: { ...corsHeaders, "Content-Type": "text/plain" },
+        });
+      }
+    }
 
     // Edge cache lookup for public GET queries
     const edgeCache = getEdgeCache();

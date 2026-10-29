@@ -114,6 +114,7 @@ interface YTAlbumItem extends ListItem {
 | `GET /api/featured?artistIds=&limit=` | `{ featuredPlaylists: YTPlaylistItem[], artists: Channel[] }` |
 | `GET /api/subfeed`                         | `YTItem[]` with `publishedMs`                                                                       |
 | `GET /api/similar`                         | `YTItem[]` (stripped fields)                                                                        |
+| `GET /api/stream?u=`                       | Bounded media bytes (`200`/`206`) for a validated `*.googlevideo.com` fallback URL; clamps `Range` to 1 MiB |
 
 ### 3a. Global Catalog Endpoints
 

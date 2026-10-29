@@ -251,6 +251,10 @@ export default async (request: Request, context: Context) => {
     if (isJson) {
       await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
 
+      const mediaProxy = (
+        Netlify.env.get("MEDIA_PROXY") || "https://api.ytify.workers.dev"
+      ).replace(/\/+$/, "");
+
       return new Response(JSON.stringify({
         title: data?.title || "Unknown Title",
         author: data?.channelTitle || "Unknown Author",
@@ -261,7 +265,7 @@ export default async (request: Request, context: Context) => {
           type: f.mimeType,
           bitrate: f.bitrate?.toString() || "",
           clen: f.contentLength,
-          url: f.url + "&fallback"
+          url: `${mediaProxy}/stream?u=${encodeURIComponent(f.url + "&fallback")}`
         })) : [],
         recommendedVideos: [],
         captions: [],

@@ -16,7 +16,11 @@ export default async function(
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
     const path = proxy ? '/api/v1/videos/' : '/s/';
-    const res = await fetch(proxy + path + id, {
+    // Bump when the fallback payload shape changes (for example, when format
+    // URLs switch to the bounded media proxy). The query string keeps stale
+    // edge-cached JSON from serving direct RapidAPI URLs for up to s-maxage.
+    const cacheBuster = proxy ? '' : '?v=2';
+    const res = await fetch(proxy + path + id + cacheBuster, {
       headers: { 'Accept': 'application/json' },
       signal
     });

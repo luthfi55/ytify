@@ -49,6 +49,25 @@ RapidAPI coordination is handled entirely inside the Netlify Edge Function using
 - Stream resolution results are cached in client memory by video ID for the duration of the playback session.
 - Cached items are invalidated upon manual quality re-selection or playback error.
 
+### REQ-AS-005: Bounded Fallback Media Proxy
+
+RapidAPI returns googlevideo URLs bound to its own egress IP. Those URLs reject
+open-ended (`Range: bytes=0-`) and full-file requests with `403`, while still
+serving small bounded ranges. A media element asks for an open-ended range, so
+fallback URLs MUST NOT be handed to the player directly.
+
+- The edge function rewrites every fallback `adaptiveFormats[].url` to
+  `${MEDIA_PROXY}/stream?u=<encoded-original-url>`, where `MEDIA_PROXY`
+  defaults to `https://api.ytify.workers.dev` and can be overridden per Netlify
+  environment.
+- `GET /stream` accepts only HTTPS `*.googlevideo.com/videoplayback` URLs that
+  carry the `fallback` marker.
+- The worker clamps every client range to at most 1 MiB and returns the
+  upstream `206` plus `Content-Range`; the media element then requests the next
+  chunk. This keeps long media playable without buffering the whole file.
+- Deploying the edge rewrite requires the worker `/stream` route to be deployed
+  first; otherwise fallback playback receives a 404 from the default worker.
+
 ---
 
 ## Completeness Criteria
@@ -57,6 +76,7 @@ RapidAPI coordination is handled entirely inside the Netlify Edge Function using
 | ------------------------------------------------------- | ------ |
 | User-configurable bitrate tiers (Opus/WebM prioritized) | ?     |
 | Fallback edge stream function at `/s/:id`               | ?     |
+| Bounded fallback media proxy at `/stream`               | ?     |
 | RapidAPI key selection by remaining quota               | ?     |
 | Blobs-backed IP cooldown and violation decay            | ?     |
 | Hard-banned subnet fast path                            | ?     |
