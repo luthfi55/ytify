@@ -4,7 +4,6 @@ import { config, setConfig } from "@config";
 import { proxyHandler } from "@modules/playback";
 import { playerStore, playNext, setPlayerStore, t, queueStore } from "@stores";
 
-
 export default function() {
 
   const [data, setData] = createSignal({
@@ -26,17 +25,18 @@ export default function() {
     onCleanup(() => {
       video.removeEventListener("enterpictureinpicture", syncPip);
       video.removeEventListener("leavepictureinpicture", syncPip);
+      if (document.pictureInPictureElement === video)
+        void document.exitPictureInPicture().catch(() => { });
     });
   });
 
   async function togglePip() {
-    if (!document.pictureInPictureEnabled) return;
-    try {
-      if (document.pictureInPictureElement) await document.exitPictureInPicture();
-      else if (video.src) await video.requestPictureInPicture();
-    } catch {
-      // Video not ready or PiP blocked by the browser.
+    if (document.pictureInPictureElement) {
+      await document.exitPictureInPicture();
+      return;
     }
+    if (!video.src || !document.pictureInPictureEnabled) return;
+    try { await video.requestPictureInPicture(); } catch { }
   }
 
   createEffect(async () => {
