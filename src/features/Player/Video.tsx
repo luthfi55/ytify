@@ -44,7 +44,10 @@ export default function() {
   const savedQ = config.watchMode || { worst: '144p', low: '240', medium: '360p', high: '720p' }[config.quality];
 
   createEffect(async () => {
-    if (!playerStore.stream.id) return;
+    const streamId = playerStore.stream.id;
+    const data = playerStore.data as Invidious & { id?: string };
+    if (!streamId || !data?.adaptiveFormats?.length || data.id !== streamId)
+      return;
     playerStore.audio.pause();
 
     const supportsAv1 = await navigator.mediaCapabilities
@@ -60,8 +63,7 @@ export default function() {
       })
       .then(result => result.supported);
 
-
-    const data = playerStore.data as Invidious;
+    if (streamId !== playerStore.stream.id) return;
 
     const hasAv1 = data.adaptiveFormats.filter(v => v.type?.includes('av01')).length === 4 ? data.adaptiveFormats.find(v => v.type?.includes('av01'))?.url : false;
     const hasVp9 = data.adaptiveFormats.find(v => v.type?.includes('vp9'))?.url;
@@ -88,18 +90,22 @@ export default function() {
       }))
     });
 
-    if (video.src) {
-      video.src = '';
-      video.pause();
-    }
     delete video.dataset.retried;
 
     // Providers name resolutions differently (Invidious vs RapidAPI), so fall
     // back to the first available stream instead of a placeholder option.
     const initialStream = videoStreams.find(v => v[0] === savedQ) ?? videoStreams[0];
     if (initialStream?.[1]) {
+      const nextSrc = proxyHandler(initialStream[1], true);
       selector.value = initialStream[1];
-      video.src = proxyHandler(initialStream[1], true);
+      if (video.src !== nextSrc) {
+        video.pause();
+        video.src = nextSrc;
+      }
+    } else {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
     }
 
   });
@@ -150,7 +156,7 @@ export default function() {
         }}
         onloadstart={() => {
           video.currentTime = playerStore.audio.currentTime;
-          video.play();
+          video.play().catch(() => {});
         }}
         onplaying={() => {
           if (playerStore.audio.paused)

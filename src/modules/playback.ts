@@ -240,12 +240,13 @@ export async function player(id?: string) {
   );
   const data = await getStreamData(id, playerAbortController.signal);
 
-  if (data && "adaptiveFormats" in data)
+  if (data && "adaptiveFormats" in data) {
+    (data as Invidious & { id?: string }).id = id;
     setPlayerStore({
       data,
       fullDuration: data.lengthSeconds,
     });
-  else {
+  } else {
     const errorData = data as Record<"error" | "message", string>;
     setPlayerStore({
       playbackState: "none",
