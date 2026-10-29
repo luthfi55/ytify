@@ -98,15 +98,31 @@
         width: 100%;
     }
 
+    /* Music artwork is square; video stills keep their native 16:9 frame. */
+    img.is-music {
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+
     @media (orientation: landscape) {
         height: 100%;
 
+        /* Office-friendly scale: artwork stays a compact square instead of
+           dominating the panel on large desktop viewports. */
         img {
-            width: 50dvh;
+            width: clamp(150px, 28dvh, 240px);
         }
 
         .lyrics {
             text-align: center;
+        }
+
+        .mediaDetails {
+            margin: var(--size-2) 0;
+        }
+
+        .slider {
+            margin-bottom: var(--size-1);
         }
     }
 
@@ -207,7 +223,7 @@
 .bottomShelf {
     display: flex;
     justify-content: space-between;
-    margin: var(--size-5) 0;
+    margin: var(--size-3) 0;
 
     i {
         font-size: var(--font-size-2) !important;
@@ -254,22 +270,45 @@
 }
 
 .watcher {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+
     video {
         width: 100%;
         aspect-ratio: 16/9;
+        max-height: 34dvh;
+        object-fit: contain;
+        background-color: #000;
         border-radius: var(--roundness);
     }
 
     select {
-        font-size: var(--font-size-2) !important;
-        width: 50%;
+        font-size: var(--font-size-1) !important;
+        flex: 1 1 auto;
+        min-width: 0;
         text-align: center;
         appearance: none;
     }
 
     button {
-        font-size: var(--font-size-2) !important;
-        width: 50%;
+        font-size: var(--font-size-1) !important;
+        flex: 0 0 auto;
+        width: auto;
+        padding: 0 var(--size-2);
+        white-space: nowrap;
+    }
+
+    .watcher-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--size-2);
+        margin-top: var(--size-2);
+    }
+
+    .watcher-pip.on {
+        background-color: var(--onBg2);
+        color: var(--text2);
     }
 
     p {

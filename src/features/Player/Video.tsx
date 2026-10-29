@@ -1,4 +1,4 @@
-import { createSignal, For, createEffect, Show } from "solid-js";
+import { createSignal, For, createEffect, Show, onMount, onCleanup } from "solid-js";
 import { generateImageUrl } from "@utils";
 import { config, setConfig } from "@config";
 import { proxyHandler } from "@modules/playback";
@@ -16,6 +16,28 @@ export default function() {
 
 
   const savedQ = config.watchMode || { worst: '144p', low: '240', medium: '360p', high: '720p' }[config.quality];
+
+  const [pipActive, setPipActive] = createSignal(false);
+
+  onMount(() => {
+    const syncPip = () => setPipActive(Boolean(document.pictureInPictureElement));
+    video.addEventListener("enterpictureinpicture", syncPip);
+    video.addEventListener("leavepictureinpicture", syncPip);
+    onCleanup(() => {
+      video.removeEventListener("enterpictureinpicture", syncPip);
+      video.removeEventListener("leavepictureinpicture", syncPip);
+    });
+  });
+
+  async function togglePip() {
+    if (!document.pictureInPictureEnabled) return;
+    try {
+      if (document.pictureInPictureElement) await document.exitPictureInPicture();
+      else if (video.src) await video.requestPictureInPicture();
+    } catch {
+      // Video not ready or PiP blocked by the browser.
+    }
+  }
 
   createEffect(async () => {
     if (!playerStore.stream.id) return;
@@ -153,7 +175,18 @@ export default function() {
 
       </video>
 
-      <div>
+      <div class="watcher-bar">
+
+        <Show when={document.pictureInPictureEnabled}>
+          <button
+            class="watcher-pip"
+            classList={{ on: pipActive() }}
+            aria-label="Picture in picture"
+            onclick={togglePip}
+          >
+            <i class="ri-picture-in-picture-2-line"></i> PiP
+          </button>
+        </Show>
 
         <button onclick={close}>{t('close')}</button>
 

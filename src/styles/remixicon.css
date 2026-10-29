@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 65
-* Generated at: 2026-10-29T02:49:35.842Z
+* Total icons: 66
+* Generated at: 2026-10-29T03:59:57.637Z
 */
 
 @font-face {
@@ -148,6 +148,10 @@
 
 .ri-pause-circle-fill:before {
   content: "\efd5";
+}
+
+.ri-picture-in-picture-2-line:before {
+  content: "\eff0";
 }
 
 .ri-play-circle-fill:before {
