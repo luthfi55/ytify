@@ -306,11 +306,6 @@
         margin-top: var(--size-2);
     }
 
-    .watcher-pip.on {
-        background-color: var(--onBg2);
-        color: var(--text2);
-    }
-
     p {
         font-size: var(--font-size-1) !important;
         font-style: italic;
