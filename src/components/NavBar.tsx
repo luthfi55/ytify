@@ -6,6 +6,19 @@ export default function NavBar() {
   return (
     <nav class="app-navbar">
       <i
+        aria-label={t("nav_home")}
+        class={"ri-home-5-" + (navStore.active === "home" ? "fill" : "line")}
+        classList={{ on: navStore.active === "home" }}
+        onclick={() => {
+          if (navStore.active === "home") {
+            navStore.home.ref?.scrollIntoView({ behavior: "smooth" });
+          } else {
+            openSubView("home");
+          }
+        }}
+      ></i>
+
+      <i
         aria-label={t("nav_queue")}
         class="ri-order-play-fill"
         classList={{ on: navStore.active === "queue" }}

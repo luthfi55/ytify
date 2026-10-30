@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 67
-* Generated at: 2026-10-29T05:01:03.163Z
+* Total icons: 71
+* Generated at: 2026-10-30T03:59:15.557Z
 */
 
 @font-face {
@@ -82,6 +82,10 @@
   content: "\ec1e";
 }
 
+.ri-delete-bin-line:before {
+  content: "\ec2a";
+}
+
 .ri-draggable:before {
   content: "\f38f";
 }
@@ -106,6 +110,10 @@
   content: "\ecb7";
 }
 
+.ri-forbid-2-line:before {
+  content: "\ed93";
+}
+
 .ri-forward-15-line:before {
   content: "\f32d";
 }
@@ -116,6 +124,14 @@
 
 .ri-heart-line:before {
   content: "\ee0f";
+}
+
+.ri-home-5-fill:before {
+  content: "\ee1e";
+}
+
+.ri-home-5-line:before {
+  content: "\ee1f";
 }
 
 .ri-import-line:before {

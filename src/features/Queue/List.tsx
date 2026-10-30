@@ -1,5 +1,5 @@
 import { lazy } from "solid-js";
-import { queueStore, setQueueStore, groupQueueByAuthor } from "@stores";
+import { queueStore, setQueueStore, groupQueueByAuthor, markQueueEdited } from "@stores";
 import { config } from "@config";
 import StreamItem from "@components/StreamItem";
 
@@ -14,6 +14,7 @@ export default function () {
           let newList = items;
           if (config.authorGrouping) newList = groupQueueByAuthor(newList);
           setQueueStore("list", newList);
+          markQueueEdited();
         }}
         idField="id"
         animation={150}

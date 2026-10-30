@@ -35,7 +35,7 @@ export default async function () {
   }
 
   if (!params.size) {
-    setNavStore("active", "search");
+    setNavStore("active", "home");
   }
 
   if (params.has("library")) {

@@ -160,6 +160,9 @@ export default function App() {
       } else if (e.key === "m" || e.key === "M") {
         e.preventDefault();
         toggleMute();
+      } else if (e.key === "0") {
+        e.preventDefault();
+        handleNavClick("home");
       } else if (e.key === "1") {
         e.preventDefault();
         handleNavClick("queue");
@@ -195,6 +198,7 @@ export default function App() {
     syncLibrary("init");
   });
 
+  const Home = navStore.home.component;
   const Queue = navStore.queue.component;
   const Search = navStore.search.component;
   const Library = navStore.library.component;
@@ -217,6 +221,9 @@ export default function App() {
         <div class="right-panel" ref={rightPanelRef}>
           <div class="right-panel-content">
             <Switch>
+              <Match when={navStore.active === "home"}>
+                <Home />
+              </Match>
               <Match when={navStore.active === "queue"}>
                 <Queue />
               </Match>
@@ -229,7 +236,7 @@ export default function App() {
               <Match when={navStore.active === "library"}>
                 <Library />
               </Match>
-              <Match when={navStore.active === "search" || true}>
+              <Match when={navStore.active === "search"}>
                 <Search />
               </Match>
             </Switch>

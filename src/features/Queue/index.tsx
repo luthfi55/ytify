@@ -6,6 +6,7 @@ import {
   t,
   setQueueStore,
   totalQueueDuration,
+  markQueueEdited,
 } from "@stores";
 import List from "./List";
 import Dropdown from "./Dropdown";
@@ -61,6 +62,7 @@ export default function () {
                 }
                 return shuffled;
               });
+              markQueueEdited();
             }}
           ></i>
 

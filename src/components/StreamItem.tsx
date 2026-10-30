@@ -14,6 +14,7 @@ import {
   setNavStore,
   playerStore,
   setPlayerStore,
+  markQueueEdited,
 } from "@stores";
 import { getCachedThumbnailUrl } from "@modules/audioCache";
 
@@ -31,6 +32,7 @@ export default function (
       get: (id: string) => boolean;
     };
     removeMode?: boolean;
+    onPlay?: (item: YTItem) => void;
   },
 ) {
   const [getImage, setImage] = createSignal("");
@@ -139,6 +141,7 @@ export default function (
             }
             return list;
           });
+          markQueueEdited();
           return;
         }
 
@@ -228,6 +231,9 @@ export default function (
             }
             return list;
           });
+
+          if (!data.onPlay) markQueueEdited();
+          data.onPlay?.(data);
         } else {
           setStore("actionsMenu", {
             id: data.id,

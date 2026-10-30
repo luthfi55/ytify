@@ -6,6 +6,7 @@ import { LikeButton } from "@components/MediaPartials";
 import CollectionSelector from "./CollectionSelector";
 import StreamItem from "@components/StreamItem";
 import { isTopicAuthor, stripTopic } from "@utils";
+import { banHomeAuthor, hideHomeItem } from "@modules/homeFeedback";
 import {
   setStore,
   store,
@@ -81,6 +82,40 @@ export default function () {
             />
           </i>
         </li>
+
+        <Show when={store.actionsMenu?.context?.src === "home"}>
+          <>
+            <li
+              tabindex="2"
+              onclick={() => {
+                const id = store.actionsMenu?.id;
+                if (id) {
+                  hideHomeItem(id);
+                  setStore("snackbar", t("home_feedback_hidden"));
+                }
+                closeDialog();
+              }}
+            >
+              <i class="ri-eye-off-line"></i>
+              {t("home_feedback_hide")}
+            </li>
+
+            <li
+              tabindex="4"
+              onclick={() => {
+                const item = store.actionsMenu;
+                if (item) {
+                  banHomeAuthor(item);
+                  setStore("snackbar", t("home_feedback_banned"));
+                }
+                closeDialog();
+              }}
+            >
+              <i class="ri-forbid-2-line"></i>
+              {t("home_feedback_ban")}
+            </li>
+          </>
+        </Show>
 
         <li
           tabindex="0"

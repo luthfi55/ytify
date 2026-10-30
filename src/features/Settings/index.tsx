@@ -5,6 +5,7 @@ import { Selector } from "@components/Selector.tsx";
 import { cachingMode, config, setConfig, setPlayerBackground, playerBackground, PanelRatio, type CachingMode, type PlayerBackground } from "@config";
 import { setCachingMode, deleteCollection, getCollection } from "@modules/library";
 import { quickSwitch } from "@modules/playback";
+import { resetHomeFeedback } from "@modules/homeFeedback";
 import { themer, applyPanelRatio } from "@modules/theme";
 import Dropdown from "./Dropdown";
 import PlayerToggle from "@components/PlayerToggle";
@@ -258,6 +259,25 @@ export default function () {
           <option value="light">{t("settings_theming_scheme_light")}</option>
           <option value="dark">{t("settings_theming_scheme_dark")}</option>
         </Selector>
+
+        <span
+          role="button"
+          tabindex="0"
+          onclick={() => {
+            if (!confirm(t("home_feedback_reset_confirm"))) return;
+            resetHomeFeedback();
+            setStore("snackbar", t("home_feedback_reset_done"));
+          }}
+          onkeydown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.currentTarget.click();
+            }
+          }}
+        >
+          <label>{t("home_feedback_reset")}</label>
+          <i class="ri-delete-bin-line"></i>
+        </span>
       </div>
       <br />
       <br />

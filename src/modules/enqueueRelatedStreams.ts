@@ -35,6 +35,6 @@ export default function(data: RecommendedVideo[]) {
     }));
 
   if (tracksToAdd.length > 0) {
-    addToQueue(tracksToAdd);
+    addToQueue(tracksToAdd, { markEdited: false });
   }
 }

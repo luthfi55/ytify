@@ -1,5 +1,6 @@
 ﻿import { createSignal } from "solid-js";
 import { lsGetJSON, lsSetJSON } from "@utils";
+import type { HomeFeedCache } from "@modules/homeFeedRanking";
 
 export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
 
@@ -179,7 +180,10 @@ export function setPlayerBackground(background: PlayerBackground) {
 export let drawer = {
   recentSearches: [] as string[],
   discovery: [] as (YTItem & { frequency: number })[],
-  lastMainFeature: "search" as "search" | "library",
+  homeFeed: null as HomeFeedCache | null,
+  homeHidden: [] as string[],
+  homeBanned: [] as string[],
+  lastMainFeature: "home" as "home" | "search" | "library",
   lastList: null as { id: string; type: string; shared?: boolean } | null,
 };
 const savedDrawer = lsGetJSON<Record<string, unknown> | null>("drawer", null);
@@ -193,6 +197,7 @@ if (savedDrawer) {
     if (savedDrawer[key] !== undefined) {
       if (
         key === "lastMainFeature" &&
+        savedDrawer[key] !== "home" &&
         savedDrawer[key] !== "search" &&
         savedDrawer[key] !== "library"
       )

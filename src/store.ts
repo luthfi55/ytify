@@ -61,6 +61,7 @@ export async function updateLang() {
   return true;
 }
 
+const Home = lazy(() => import("@features/Home"));
 const Search = lazy(() => import("@features/Search"));
 const Library = lazy(() => import("@features/Library"));
 const List = lazy(() => import("@features/List"));
@@ -72,7 +73,13 @@ export const params = new URL(
   typeof location !== "undefined" ? location.href : "https://ytify.app/",
 ).searchParams;
 
-export type MainFeature = "queue" | "search" | "library" | "list" | "settings";
+export type MainFeature =
+  | "home"
+  | "queue"
+  | "search"
+  | "library"
+  | "list"
+  | "settings";
 type SidePanel = "player";
 
 type Nav = {
@@ -91,8 +98,9 @@ type Nav = {
 export const [navStore, setNavStore] = createStore<
   Nav & { active: MainFeature }
 >({
-  active: "search",
+  active: "home",
   player: { ref: null, state: false, component: Player },
+  home: { ref: null, component: Home },
   queue: { ref: null, component: Queue },
   search: { ref: null, component: Search },
   library: { ref: null, component: Library },
@@ -106,6 +114,11 @@ function getCleanHref(targetFeature: MainFeature): string {
   url.searchParams.delete("library");
   params.delete("library");
 
+  if (targetFeature === "home") {
+    for (const key of [...params.keys()]) params.delete(key);
+    return import.meta.env.BASE_URL + url.hash;
+  }
+
   let query = url.searchParams.toString();
   if (targetFeature === "library") {
     params.set("library", "");
@@ -115,15 +128,15 @@ function getCleanHref(targetFeature: MainFeature): string {
 }
 
 export function openSubView(feature: MainFeature) {
-  if (feature === "search") {
+  if (feature === "home") {
     if (typeof history !== "undefined") {
       history.replaceState(
         { ...(history.state || {}), panel: null },
         "",
-        getCleanHref("search"),
+        getCleanHref("home"),
       );
     }
-    setNavStore("active", "search");
+    setNavStore("active", "home");
     return;
   }
   if (navStore.active !== feature) {
@@ -143,10 +156,10 @@ export function closeSubView() {
       history.replaceState(
         { ...(history.state || {}), panel: null },
         "",
-        getCleanHref("search"),
+        getCleanHref("home"),
       );
     }
-    setNavStore("active", "search");
+    setNavStore("active", "home");
   }
 }
 
@@ -161,7 +174,7 @@ if (typeof window !== "undefined") {
       setNavStore("active", e.state.panel);
     } else {
       params.delete("library");
-      setNavStore("active", "search");
+      setNavStore("active", "home");
     }
   });
 }
@@ -321,7 +334,7 @@ export function playNext() {
   });
   setQueueStore("list", (l) => {
     let newList = l.slice(1);
-    if (newList.length > 1) {
+    if (newList.length > 1 && !queueStore.homeSession) {
       if (config.persistentShuffle) newList = shuffle(newList);
       if (config.authorGrouping) newList = groupQueueByAuthor(newList);
     }
@@ -547,6 +560,7 @@ async function getRecommendations() {
           ...item,
           context: { src: "queue", id: `Similar to ${currentTitle}` },
         })),
+        { markEdited: false },
       ),
     )
     .catch((e) =>
@@ -562,7 +576,13 @@ export const [queueStore, setQueueStore] = createStore({
   history: [] as TrackItem[],
   removeMode: false,
   isLoading: false,
+  /** True while the queue is the unedited continuation of a Home feed play. */
+  homeSession: false as boolean,
 });
+
+export function markQueueEdited() {
+  if (queueStore.homeSession) setQueueStore("homeSession", false);
+}
 
 /**
  * Filter items based on configuration and state.
@@ -607,6 +627,7 @@ export function addToQueue(
   options: {
     replace?: boolean;
     prepend?: boolean;
+    markEdited?: boolean;
   } = {},
 ) {
   // Items with context.src === '' bypass all config filters
@@ -624,6 +645,8 @@ export function addToQueue(
     }
     return combined;
   });
+
+  if (options.markEdited !== false) markQueueEdited();
 }
 
 export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
@@ -928,7 +951,7 @@ export async function getList(
 
 export function resetList() {
   if (navStore.active === "list") {
-    openSubView("search");
+    openSubView("home");
   }
   listStore.observer.disconnect();
 

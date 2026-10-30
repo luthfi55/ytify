@@ -1,4 +1,4 @@
-import { onMount, Show, lazy } from "solid-js";
+import { onMount, Show } from "solid-js";
 import "./Search.css";
 import Results from "./Results";
 import Input from "./Input";
@@ -6,8 +6,6 @@ import { searchStore, t, setNavStore } from "@stores";
 import Filters from "./Filters";
 import HeaderNav from "@components/HeaderNav";
 import HeaderActions from "@components/HeaderActions";
-
-const About = lazy(() => import("./About"));
 
 export default function () {
   let searchRef!: HTMLElement;
@@ -31,7 +29,11 @@ export default function () {
 
       <Show
         when={searchStore.query || searchStore.results.length > 0}
-        fallback={<About />}
+        fallback={
+          <div>
+            <p class="fallback">{t("search_empty_hint")}</p>
+          </div>
+        }
       >
         <Results />
       </Show>

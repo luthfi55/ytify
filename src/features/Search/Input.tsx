@@ -18,6 +18,7 @@ export default function () {
 
   onMount(() => {
     getSearchResults();
+    if (!searchStore.query) superInput.focus();
   });
 
   function textToSearch(text: string) {

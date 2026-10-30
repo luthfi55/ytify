@@ -11,7 +11,8 @@ const instances = shuffle([
 
 export default async function(
   id: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  options?: { sideEffects?: boolean }
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
@@ -83,8 +84,10 @@ export default async function(
   const data = cached || await getData();
 
   if (data) {
-    streamCache.set(id, data);
-    setPlayerStore('proxy', data.proxy || '');
+    if (options?.sideEffects !== false) {
+      streamCache.set(id, data);
+      setPlayerStore('proxy', data.proxy || '');
+    }
     return data;
   }
 

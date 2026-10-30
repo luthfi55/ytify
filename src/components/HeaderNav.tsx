@@ -16,7 +16,7 @@ interface HeaderNavProps {
 }
 
 export function handleNavClick(
-  feature: "queue" | "search" | "library" | "list",
+  feature: "home" | "queue" | "search" | "library" | "list",
 ) {
   if (navStore.active === feature) {
     navStore[feature].ref?.scrollIntoView({ behavior: "smooth" });
@@ -47,6 +47,13 @@ export default function HeaderNav(props: HeaderNavProps) {
       <div class="header-title">{props.title}</div>
 
       <nav class="header-nav">
+        <span
+          class="header-nav-item"
+          classList={{ active: navStore.active === "home" }}
+          onclick={() => handleNavClick("home")}
+        >
+          {t("nav_home")}
+        </span>
         <span
           class="header-nav-item"
           classList={{ active: navStore.active === "queue" }}

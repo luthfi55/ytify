@@ -6,6 +6,7 @@ import {
   queueStore,
   setQueueStore,
   groupQueueByAuthor,
+  markQueueEdited,
 } from "@stores";
 import { config, setConfig } from "@config";
 
@@ -75,6 +76,7 @@ export default function Dropdown() {
             (e.currentTarget as HTMLElement).classList.toggle("on");
             if (authorGrouping) {
               setQueueStore("list", (list) => groupQueueByAuthor(list));
+              markQueueEdited();
             }
           }}
         >
@@ -85,6 +87,7 @@ export default function Dropdown() {
           onclick={() => {
             setQueueStore("list", []);
             setQueueStore("history", []);
+            markQueueEdited();
           }}
         >
           {t("queue_clear")}

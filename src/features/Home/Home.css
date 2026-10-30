@@ -1,0 +1,101 @@
+.homeSection {
+  padding-bottom: var(--size-8);
+}
+
+.home-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  p {
+    margin: 0;
+    font-size: var(--font-size-5);
+    font-weight: var(--font-weight-6);
+  }
+
+  small {
+    opacity: 0.7;
+    font-size: var(--font-size-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.home-refresh {
+  display: grid;
+  place-items: center;
+  padding: var(--size-2);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: var(--font-size-5);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+.home-feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2);
+}
+
+.home-more {
+  width: 100%;
+  margin: var(--size-4) 0;
+  padding: var(--size-3);
+  border: var(--border);
+  border-radius: var(--roundness);
+  background-color: var(--onBg);
+  color: inherit;
+  font-size: inherit;
+  font-weight: var(--font-weight-5);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+.home-loading,
+.home-error,
+.home-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--size-3);
+  padding: var(--size-6) var(--size-4);
+  text-align: center;
+}
+
+.home-loading p,
+.home-error p,
+.home-empty p {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.home-empty-body {
+  font-size: var(--font-size-2);
+}
+
+.home-cta {
+  padding: var(--size-2) var(--size-5);
+  border: var(--border);
+  border-radius: var(--roundness);
+  background-color: var(--onBg);
+  color: inherit;
+  font-size: inherit;
+  font-weight: var(--font-weight-5);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface);
+  }
+}
