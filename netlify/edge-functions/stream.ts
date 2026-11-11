@@ -1,12 +1,21 @@
 import { Config, Context } from "@netlify/edge-functions";
 import { getStore } from "@netlify/blobs";
 
-interface IPRecord {
+export interface IPRecord {
   lastSeen: number;
   totalViolations: number;
+  /** Bucket state; absent on records written before the bucket existed. */
+  tokens?: number;
+  tokensAt?: number;
 }
 
-interface RapidAPIState {
+// Burst allowance per client IP: a fresh visitor may resolve a handful of
+// videos back to back (home-feed seeds, then a play) and is otherwise
+// rate-limited to one request every IP_REFILL_MS.
+const IP_BURST_CAPACITY = 8;
+const IP_REFILL_MS = 10000;
+
+export interface RapidAPIState {
   keys: Array<{
     remaining: number;
     resetsat: number;
@@ -41,11 +50,21 @@ const HARD_BANNED_SUBNETS = [
 ];
 
 function getClientIp(request: Request, context: Context): string {
+  // Netlify-set values are authoritative: a client can send its own
+  // X-Forwarded-For and would otherwise spoof the ban list and the quota
+  // bucket (or frame another IP).
+  const netlifyIp =
+    request.headers.get("x-nf-client-connection-ip") || context.ip;
+  if (netlifyIp) return netlifyIp;
+
   const xForwardedFor = request.headers.get("x-forwarded-for");
   if (xForwardedFor) {
-    return xForwardedFor.split(",")[0].trim();
+    const hops = xForwardedFor.split(",").map((hop) => hop.trim()).filter(Boolean);
+    // The rightmost entry is the hop our own edge appended.
+    if (hops.length) return hops[hops.length - 1];
   }
-  return request.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
+
+  return "unknown";
 }
 
 async function getRapidAPIState() {
@@ -105,7 +124,61 @@ function selectBestKey(state: RapidAPIState | null, allKeys: string[]): { key: s
   return { key: available[0].key, index: available[0].index };
 }
 
-async function updateRapidAPIState(index: number, remaining: number, resetsat: number, ip: string) {
+/**
+ * Debts one token from the client IP's burst bucket.
+ *
+ * The previous rule rejected every request from an IP that had resolved
+ * anything in the last 20 seconds, which made normal playback impossible: the
+ * home feed resolves a few seed videos in parallel on load, so the user's own
+ * play request was already inside the cooldown window and came back 403.
+ */
+export function takeIpToken(
+  state: RapidAPIState | null,
+  ip: string,
+  now: number,
+): { allowed: boolean; record: IPRecord; retryAfter: number } {
+  const existing = state?.ips?.[ip];
+  const violations =
+    existing && typeof existing === 'object' ? existing.totalViolations || 0 : 0;
+
+  const storedTokens = Number.isFinite(existing?.tokens)
+    ? (existing as IPRecord).tokens as number
+    : IP_BURST_CAPACITY;
+  const storedAt = Number.isFinite(existing?.tokensAt)
+    ? (existing as IPRecord).tokensAt as number
+    : now;
+
+  const available = Math.min(
+    IP_BURST_CAPACITY,
+    storedTokens + Math.max(0, now - storedAt) / IP_REFILL_MS,
+  );
+  const allowed = available >= 1;
+
+  const record: IPRecord = {
+    lastSeen: now,
+    totalViolations: allowed ? violations : violations + 1,
+    tokens: allowed ? available - 1 : available,
+    tokensAt: now,
+  };
+
+  if (state) state.ips[ip] = record;
+
+  return {
+    allowed,
+    record,
+    retryAfter: allowed
+      ? 0
+      : Math.max(1, Math.ceil(((1 - available) * IP_REFILL_MS) / 1000)),
+  };
+}
+
+async function updateRapidAPIState(
+  index: number,
+  remaining: number,
+  resetsat: number,
+  ip: string,
+  gate: IPRecord | null,
+) {
   const store = getStore("rapidapi");
   const state = (await getRapidAPIState()) || { keys: [], ips: {} };
 
@@ -121,9 +194,13 @@ async function updateRapidAPIState(index: number, remaining: number, resetsat: n
     ? existingRecord.totalViolations
     : 0;
 
+  // Keep the bucket the gate already debited; re-reading the store here can
+  // race with a concurrent request and would otherwise refund tokens.
   state.ips[ip] = {
     lastSeen: Date.now(),
-    totalViolations: historicalViolations
+    totalViolations: gate?.totalViolations ?? historicalViolations,
+    tokens: gate?.tokens ?? existingRecord?.tokens,
+    tokensAt: gate?.tokensAt ?? existingRecord?.tokensAt,
   };
 
   try {
@@ -150,7 +227,7 @@ export default async (request: Request, context: Context) => {
     return new Response('Fast Gateway Firewall Drop | You have been restricted from access to the SoundDesk fallback service.', {
       status: 403,
       headers: {
-        "Cache-Control": "public, s-maxage=86400",
+        "Cache-Control": "private, no-store",
         "Vary": "x-forwarded-for"
       }
     });
@@ -166,44 +243,34 @@ export default async (request: Request, context: Context) => {
   let selectedKey = "";
   let selectedIndex = 0;
   let state: RapidAPIState | null = null;
+  let gateRecord: IPRecord | null = null;
 
   if (isJson) {
     state = await getRapidAPIState();
     const now = Date.now();
-    const BASE_COOLDOWN = 20000;
+    const gate = takeIpToken(state, clientIp, now);
 
-    if (state && state.ips[clientIp]) {
-      const record = state.ips[clientIp];
+    if (!gate.allowed) {
+      const store = getStore("rapidapi");
+      if (state) await store.setJSON("data", state);
 
-      // ✅ STRUCTURAL PROTECTION FALLBACK: Handle transitions from raw numbers to objects cleanly
-      const lastSeenTime = record && typeof record === 'object' ? record.lastSeen : Number(record || 0);
-      const timePassed = now - lastSeenTime;
+      console.warn(
+        `[VIOLATION] IP ${clientIp} exhausted its stream resolution budget. Metrics Accumulator: ${gate.record.totalViolations}.`,
+      );
 
-      // 🛑 The Simple Rule: If they hit the server within less than 60 seconds, drop them.
-      if (timePassed <= BASE_COOLDOWN) {
-        // Guarantee structure allocation before setting internal values
-        if (!state.ips[clientIp] || typeof state.ips[clientIp] !== 'object') {
-          state.ips[clientIp] = { lastSeen: now, totalViolations: 0 };
-        }
-
-        // Increment tracking values safely for your metrics
-        state.ips[clientIp].totalViolations += 1;
-        state.ips[clientIp].lastSeen = now;
-
-        const store = getStore("rapidapi");
-        await store.setJSON("data", state);
-
-        console.warn(`[VIOLATION] IP ${clientIp} requested early. Metrics Accumulator: ${state.ips[clientIp].totalViolations}. Returning cached empty 403.`);
-
-        return new Response(null, {
-          status: 403,
-          headers: {
-            "Cache-Control": "public, s-maxage=86400",
-            "Vary": "x-forwarded-for"
-          }
-        });
-      }
+      // Never cache a per-IP rejection: a shared CDN entry would keep blocking
+      // this client (and everyone behind the same NAT) long after the bucket
+      // refilled.
+      return new Response(null, {
+        status: 403,
+        headers: {
+          "Cache-Control": "private, no-store",
+          "Retry-After": String(gate.retryAfter),
+        },
+      });
     }
+
+    gateRecord = gate.record;
 
     const selection = selectBestKey(state, allKeys);
     selectedKey = selection.key;
@@ -229,7 +296,9 @@ export default async (request: Request, context: Context) => {
     if (!res.ok) {
       console.error(`[RAPIDAPI ERROR] Key Index: ${selectedIndex}, Status: ${res.status}. Raw Payload: ${rawResponseText}`);
       if (isJson) {
-        await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
+        await updateRapidAPIState(
+          selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp, gateRecord,
+        );
       }
       throw new Error(`RapidAPI HTTP Error: ${res.status}`);
     }
@@ -249,7 +318,9 @@ export default async (request: Request, context: Context) => {
     const expireSeconds = parseInt(data?.expiresInSeconds || "21600");
 
     if (isJson) {
-      await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
+      await updateRapidAPIState(
+        selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp, gateRecord,
+      );
 
       const mediaProxy = (
         Netlify.env.get("MEDIA_PROXY") || "https://api.ytify.workers.dev"

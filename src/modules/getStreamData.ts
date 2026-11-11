@@ -20,7 +20,9 @@ export default async function(
     // Bump when the fallback payload shape changes (for example, when format
     // URLs switch to the bounded media proxy). The query string keeps stale
     // edge-cached JSON from serving direct RapidAPI URLs for up to s-maxage.
-    const cacheBuster = proxy ? '' : '?v=2';
+    // v3: earlier builds cached per-IP 403s for 24h under v2; the gate no
+    // longer caches rejections, and the new key skips those poisoned entries.
+    const cacheBuster = proxy ? '' : '?v=3';
     const res = await fetch(proxy + path + id + cacheBuster, {
       headers: { 'Accept': 'application/json' },
       signal

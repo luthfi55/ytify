@@ -35,8 +35,10 @@ RapidAPI coordination is handled entirely inside the Netlify Edge Function using
 
 - **Key Selection**:
   The `keys` array tracks `remaining` quota and `resetsat` per configured key. The key with the most remaining quota is selected; exhausted keys reset after their advertised window.
-- **Client IP Cooldown**:
-  JSON requests from the same client IP within 20 seconds receive a bodyless `403` cached for 24 hours. Repeated violations increment `totalViolations`.
+- **Client IP Burst Budget**:
+  JSON requests debit a per-IP token bucket (`8` tokens, one token refilled every `10` seconds). Exhausted buckets receive a bodyless `403` with a `Retry-After` header and `Cache-Control: private, no-store`; refusals MUST NOT be cached, because a shared CDN entry would keep blocking the client (and everyone behind the same NAT) after the bucket refilled. A single IP may therefore resolve a handful of videos back to back — the home feed resolves several seeds on load, and a per-request cooldown would reject the user's own play request. Repeated refusals increment `totalViolations`.
+- **Client IP Source**:
+  The client IP MUST come from Netlify's own `x-nf-client-connection-ip` / `context.ip`. Client-supplied `x-forwarded-for` is only a last resort, since it lets a caller spoof the ban list and the burst bucket.
 - **Violation Decay**:
   `totalViolations` decays by one every six hours and the IP record is removed when it reaches zero.
 - **Quota Telemetry**:
